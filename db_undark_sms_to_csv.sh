@@ -130,7 +130,6 @@ ATTACH '$dbfile' AS 'orig';
 --SELECT m.rowid as RowID, DATETIME(date + 978307200, 'unixepoch', 'localtime') as Date, handle_id as "Handle ID", m.service as Service, CASE is_from_me WHEN 0 THEN "Received" WHEN 1 THEN "Sent" ELSE "Unknown" END as Type, CASE WHEN date_read > 0 then DATETIME(date_read + 978307200, 'unixepoch') WHEN date_delivered > 0 THEN DATETIME(date_delivered + 978307200, 'unixepoch') ELSE NULL END as "Date Read/Sent", text as Text FROM undarked_message m ORDER BY m.rowid ASC;
 --SELECT m.rowid as RowID, DATETIME(date + 978307200, 'unixepoch', 'localtime') as Date, h.id as "Phone Number", m.service as Service, CASE is_from_me WHEN 0 THEN "Received" WHEN 1 THEN "Sent" ELSE "Unknown" END as Type, CASE WHEN date_read > 0 then DATETIME(date_read + 978307200, 'unixepoch') WHEN date_delivered > 0 THEN DATETIME(date_delivered + 978307200, 'unixepoch') ELSE NULL END as "Date Read/Sent", text as Text FROM undarked_message m, orig.handle h WHERE h.rowid = m.handle_id ORDER BY m.rowid ASC;
 --qry with handle
---select m.rowid, m.text, id from undarked_message m left join orig.handle on orig.handle.rowid='-1' where m.rowid='10006';
 SELECT m.rowid as RowID, DATETIME(date + 978307200, 'unixepoch', 'localtime') as Date, orig.handle.id as "Phone Number", m.service as Service, CASE is_from_me WHEN 0 THEN "Received" WHEN 1 THEN "Sent" ELSE "Unknown" END as Type, CASE WHEN date_read > 0 then DATETIME(date_read + 978307200, 'unixepoch') WHEN date_delivered > 0 THEN DATETIME(date_delivered + 978307200, 'unixepoch') ELSE NULL END as "Date Read/Sent", text as Text FROM undarked_message m LEFT JOIN orig.handle on orig.handle.rowid=m.handle_id ORDER by m.rowid ASC;
 --qry no handle matches
 --SELECT m.rowid as RowID, DATETIME(date + 978307200, 'unixepoch', 'localtime') as Date, h.id as "Phone Number", m.service as Service, CASE is_from_me WHEN 0 THEN "Received" WHEN 1 THEN "Sent" ELSE "Unknown" END as Type, CASE WHEN date_read > 0 then DATETIME(date_read + 978307200, 'unixepoch') WHEN date_delivered > 0 THEN DATETIME(date_delivered + 978307200, 'unixepoch') ELSE NULL END as "Date Read/Sent", text as Text FROM undarked_message m left join orig.handle h on m.handle_id = h.rowid where h.rowid is null ORDER BY m.rowid ASC;
@@ -140,10 +139,9 @@ SELECT * from undarked_handle;
 .quit
 EOS
 
-#rm $tval_out $tval_sql $tval_mod_sql
-
 cp $tval_qry_out ../$outfile
 cp $tval_handle_qry_out ../$handle_outfile
 cat $tval_qry_out $tval_handle_qry_out  > "total_$outfile"
 cp "total_$outfile" ..
+#rm $tval_out $tval_sql $tval_mod_sql
 cd ..
